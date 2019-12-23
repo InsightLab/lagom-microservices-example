@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        html, body, #mapid { height: 100%; margin: 0; padding: 0; }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>    
+</head>
+<body>
+    <div id="mapid"></div>
+    <select name="" id=""></select>
+    
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+    <script>
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+        var mymap = L.map('mapid').setView([-22.91393, -43.59801], 13);
+        var busesMarkers = L.layerGroup().addTo(mymap);
+        let fitted = false;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18
+        }).addTo(mymap);
+
+        function renderBuses(busesData) {
+            mymap.removeLayer(busesMarkers);
+            busesMarkers = L.layerGroup().addTo(mymap);
+            const latLngs = [];
+
+            for (let bus of busesData) {    
+                const [datetime, number, line, lat, lng, velocity] = bus;
+                L.marker([lat, lng]).addTo(busesMarkers);
+                latLngs.push([lat, lng]);
+            }
+
+            if (!fitted) {
+                var bounds = new L.LatLngBounds(latLngs);
+                mymap.fitBounds(bounds);
+                fitted = true;
+            }
+        }
+        
+        // fetch('/api/buses')
+        // .then(response => response.json())
+        // .then(json => {
+        //     renderBuses(json.buses);
+        // });
+
+        var connection = new WebSocket('ws://' + window.location.host + '/' + window.location.pathname.split('/').slice(1)[0]);
+        connection.onmessage = function (message) {
+            var json;
+            try {
+                json = JSON.parse(message.data);
+            } catch (e) {
+                console.log('This doesn\'t look like a valid JSON: ',
+                    message.data);
+                return;
+            }
+
+            if (json) {
+                renderBuses(json);
+            }
+        };
+    </script>
+</body>
+</html>
