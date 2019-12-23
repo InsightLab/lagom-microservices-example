@@ -1,6 +1,5 @@
 const BusesService = require('../services/buses');
-
-const wsConnections = BusesService.getWsConnections();
+const { LINE_NAME } = require('../services/utils/api-translation');
 
 module.exports = {
     async getBusesLines(req, res) {
@@ -16,32 +15,35 @@ module.exports = {
         });
     },
     async getStationsByLineAndDirection(req, res) {
-        BusesService.getStationsByLineAndDirection(req.params.lineCode, req.query.direction)
-        .then(({ data }) => {
+        BusesService.getStationsByLineAndDirection(
+            req.params.lineCode, req.query.direction
+        ).then((data) => {
             res.json(data);
         });
     },
     handleStreamConnection(request) {
         const connection = request.accept(null, request.origin);
-
+ 
         connection.on('message', async message => {
             if (message.type === 'utf8') {
-                const busLine = message.utf8Data;
+                const [busLine, busDirection] = message.utf8Data.split(', ');
                 const busesLines = await BusesService.getLines();
 
-                if (busesLines.includes(parseInt(busLine))) {
-                    wsConnections[connection.id] = {
-                        connection,
-                        busLine
-                    };
+                if (busesLines.some(bl => bl.lineName === busLine)) {
+                    const lineCode = busesLines
+                                    .find(bl => bl.lineName === busLine)
+                                    .sublines
+                                    .find(sbl => sbl.direction === parseInt(busDirection))
+                                    .lineCode;
 
-                    BusesService.sendBusesLineData(connection, busLine);
+                    BusesService.addWsConnection(connection, lineCode);
+                    BusesService.sendBusesLineData(connection, lineCode);
                 }
             }
         });
         
         connection.on('close', () => {
-            delete wsConnections[connection.id];
+            BusesService.removeWsConnection(connection.id);
         });
     }
 }

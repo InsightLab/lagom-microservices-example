@@ -1,4 +1,13 @@
 const axios = require('axios');
+const { convertBusfromTheyToUs, convertLinefromTheyToUs } = require('./utils/buses');
+const {
+    BUSES_BY_LINE,
+    VEHICLES,
+    TERMINAL_1,
+    TERMINAL_2,
+    LINE_CODE,
+    OPERATION_MODE
+} = require('./utils/api-translation');
 const _ = require('lodash');
 
 const BusAPI = axios.create({
@@ -8,26 +17,31 @@ const BusAPI = axios.create({
 
 axios.defaults.withCredentials = true;
 
-const refreshToken = async () => {
-    try {
-        const response = await BusAPI.post('/Login/Autenticar', {}, {
-            params: {
-                token: process.env.API_OLHO_VIVO_TOKEN
+BusAPI.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const response = await BusAPI.post('/Login/Autenticar', {}, {
+                    params: { token: process.env.API_OLHO_VIVO_TOKEN }
+                });
+            
+                const { data: isAuthenticated } = response;
+            
+                if (isAuthenticated) {
+                    BusAPI.defaults.headers.common['Cookie'] = response.headers['set-cookie'][0];
+                }   
+
+                return axios(originalRequest);
+            } catch(e) {
+                return axios(originalRequest);
             }
-        });
-
-        const { data: isAuthenticated } = response;
-
-        if (isAuthenticated) {
-            BusAPI.defaults.headers = {
-                Cookie: response.headers['set-cookie'][0]
-            };
-        }   
-    } catch(e) { }
-}
-
-
-refreshToken();
+        }
+    }
+);
 
 let busesLines = [];
 
@@ -43,14 +57,21 @@ const getLines = async () => {
     if (busesLines.length === 0) {
         try {
             const { data } = await getAllBuses();
-            const { l: lines } = data;
-            busesLines = _.groupBy(
+            const lines = data[BUSES_BY_LINE];
+            const busesByLines = _.groupBy(
                 lines.map(line => ({
                     ...line,
-                    vs: null
+                    [VEHICLES]: undefined
                 })),
                 'c'
             );
+
+            busesLines = Object.keys(busesByLines).map(lineName => ({
+                lineName,
+                terminal1: busesByLines[lineName][0][TERMINAL_1],
+                terminal2: busesByLines[lineName][0][TERMINAL_2],
+                sublines: busesByLines[lineName].map(line => convertLinefromTheyToUs(line))
+            }));
         } catch (e) {
             busesLines = [];
         }
@@ -63,14 +84,7 @@ const getDataByLine = async busLine => {
     if (busLine) {
         try {
             const { data } = await getBusesByLine(busLine);
-            busesData[busLine] = data.vs.map(bus => ({
-                datetime: bus.ta,
-                busId: bus.p,
-                line: busLine,
-                lat: bus.py,
-                lng: bus.px,
-                velocity: null
-            }));
+            busesData[busLine] = data[VEHICLES].map(bus => convertBusfromTheyToUs(bus));
         } catch (e) {
             busesData[busLine] = [];
             console.error(new Error(`An error occurred in fetch the buses data of line ${busLine}.`));
@@ -79,22 +93,17 @@ const getDataByLine = async busLine => {
 };
 
 const fetchAllData = async () => {
+    let busesLines = [];
     try {
-        const { data: { l: busesLines } } = await getAllBuses();
-        busesLines.forEach((busLine, i) => {
-            busesData[busLine.cl] = busLine.vs.map(bus => ({
-                datetime: bus.ta,
-                busId: bus.p,
-                line: busLine,
-                lat: bus.py,
-                lng: bus.px,
-                velocity: null
-            }));
-        });
+        const { data } = await getAllBuses();
+        busesLines = data[BUSES_BY_LINE];
     } catch(e) {
-        console.log(e);
         console.error(new Error('An error occurred in fetch some bus data.'));
     }
+
+    busesLines.forEach((busLine) => {
+        busesData[busLine[LINE_CODE]] = busLine[VEHICLES].map(bus => convertBusfromTheyToUs(bus));
+    });
 };
 
 const sendBusesLineData = (connection, busLine) => {
@@ -114,12 +123,13 @@ function getAllBuses() {
 
 async function getStationsByLineAndDirection(lineCode, direction) {
     try {
-        const { data } = await BusAPI.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
-        const line = data.filter(line => line.tl === 10)[0];
-        console.log(data);
-        const { data: stations } = await BusAPI.get(`/Parada/BuscarParadasPorLinha?codigoLinha=${line}`);
+        const { data: lines } = await BusAPI.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
+        const line = lines.find(line => line[OPERATION_MODE] === 10);
+        const { data: stations } = await BusAPI.get(`/Parada/BuscarParadasPorLinha?codigoLinha=${line[LINE_CODE]}`);
         return stations;
-    } catch { }
+    } catch {
+        return [];
+    }
 };
 
 module.exports = {
@@ -129,6 +139,15 @@ module.exports = {
     sendBusesLineData,
     getWsConnections() {
         return wsConnections;
+    },
+    removeWsConnection(connectionId) {
+        delete wsConnections[connectionId];
+    },
+    addWsConnection(connection, busLine) {
+        wsConnections[connection.id] = {
+            connection,
+            busLine
+        };
     },
     getGetBusesLines() {
         return busesLines;

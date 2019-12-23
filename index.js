@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const wsServer = new WebSocketServer({
     httpServer: server
 });
-const JOB_TIMEOUT = 10000; // 10 sec
+const JOB_TIMEOUT = 20000; // 20 sec
 
 app.use((_, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
