@@ -6,7 +6,8 @@ const {
     TERMINAL_1,
     TERMINAL_2,
     LINE_CODE,
-    OPERATION_MODE
+    OPERATION_MODE,
+    BUS_ID
 } = require('./utils/api-translation');
 const _ = require('lodash');
 
@@ -92,6 +93,11 @@ const getDataByLine = async busLine => {
     }
 };
 
+
+function _computeAngle([ax, ay], [bx, by]) {
+    return (Math.atan2(by - ay, bx - ax) * 180 / Math.PI);
+};
+
 const fetchAllData = async () => {
     let busesLines = [];
     try {
@@ -102,7 +108,32 @@ const fetchAllData = async () => {
     }
 
     busesLines.forEach((busLine) => {
-        busesData[busLine[LINE_CODE]] = busLine[VEHICLES].map(bus => convertBusfromTheyToUs(bus));
+        if (Array.isArray(busesData[busLine[LINE_CODE]])) {
+            busesData[busLine[LINE_CODE]] = busesData[busLine[LINE_CODE]].sort((b1, b2) => b1.busId - b2.busId);
+        } else {
+            busesData[busLine[LINE_CODE]] = [];
+        }
+
+        busesData[busLine[LINE_CODE]] = busLine[VEHICLES]
+        .sort((b1, b2) => b1[BUS_ID] - b2[BUS_ID])
+        .map((bus, i) => {
+            const newBus = convertBusfromTheyToUs(bus);
+            const oldBus = busesData[busLine[LINE_CODE]][i];
+            let rotationAngle = 0;
+
+            if (oldBus) {
+                rotationAngle = -_computeAngle(
+                    [oldBus.lng, oldBus.lat],
+                    [newBus.lng, newBus.lat]
+                );
+                rotationAngle = rotationAngle === 0 ? oldBus.rotationAngle : rotationAngle;
+            }
+
+            return {
+                ...newBus,
+                rotationAngle
+            };
+        });
     });
 };
 
@@ -125,7 +156,7 @@ async function getStationsByLineAndDirection(lineCode, direction) {
     try {
         const { data: lines } = await BusAPI.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
         const line = lines.find(line => line[OPERATION_MODE] === 10);
-        const { data: stations } = await BusAPI.get(`/Parada/BuscarParadasPorLinha?codigoLinha=${line[LINE_CODE]}`);
+        const { data: stations } = await BusAPI.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
         return stations;
     } catch {
         return [];

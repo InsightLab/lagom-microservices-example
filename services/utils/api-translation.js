@@ -23,7 +23,8 @@ const translationEnum = {
     STATION_NAME: 'np',
     BUSES_BY_LINE: 'l',
     OPERATION_MODE: 'tl',
-    CIRCULAR: 'lc'
+    CIRCULAR: 'lc',
+    STATIONS: 'ps'
 };
 
 module.exports = translationEnum;

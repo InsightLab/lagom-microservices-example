@@ -1,5 +1,5 @@
 const BusesService = require('../services/buses');
-const { LINE_NAME } = require('../services/utils/api-translation');
+const { LINE_NAME, STATIONS } = require('../services/utils/api-translation');
 
 module.exports = {
     async getBusesLines(req, res) {
@@ -18,7 +18,7 @@ module.exports = {
         BusesService.getStationsByLineAndDirection(
             req.params.lineCode, req.query.direction
         ).then((data) => {
-            res.json(data);
+            res.json(data[STATIONS]);
         });
     },
     handleStreamConnection(request) {
