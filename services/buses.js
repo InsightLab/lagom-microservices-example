@@ -1,4 +1,4 @@
-const axios = require('axios');
+const BusesApi = require('./busesApi');
 const { convertBusfromTheyToUs, convertLinefromTheyToUs } = require('./utils/buses');
 const {
     BUSES_BY_LINE,
@@ -7,42 +7,10 @@ const {
     TERMINAL_2,
     LINE_CODE,
     OPERATION_MODE,
-    BUS_ID
+    BUS_ID,
+    LINE_NAME
 } = require('./utils/api-translation');
 const _ = require('lodash');
-
-const BusAPI = axios.create({
-    baseURL: `http://api.olhovivo.sptrans.com.br/v2.1`,
-    withCredentials: true
-});
-
-axios.defaults.withCredentials = true;
-
-BusAPI.interceptors.response.use(
-    response => response,
-    async error => {
-        const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-
-            try {
-                const response = await BusAPI.post('/Login/Autenticar', {}, {
-                    params: { token: process.env.API_OLHO_VIVO_TOKEN }
-                });
-            
-                const { data: isAuthenticated } = response;
-            
-                if (isAuthenticated) {
-                    BusAPI.defaults.headers.common['Cookie'] = response.headers['set-cookie'][0];
-                }   
-
-                return axios(originalRequest);
-            } catch(e) {
-                return axios(originalRequest);
-            }
-        }
-    }
-);
 
 let busesLines = [];
 
@@ -51,7 +19,7 @@ let busesData = {}; // Cache of buses data
 const wsConnections = {}; // List of all websocket connections
 
 const getBusesByLine = line => {
-    return BusAPI.get(`/Posicao/Linha?codigoLinha=${line}`);
+    return BusesApi.get(`/Posicao/Linha?codigoLinha=${line}`);
 };
 
 const getLines = async () => {
@@ -64,7 +32,7 @@ const getLines = async () => {
                     ...line,
                     [VEHICLES]: undefined
                 })),
-                'c'
+                LINE_NAME
             );
 
             busesLines = Object.keys(busesByLines).map(lineName => ({
@@ -149,14 +117,14 @@ const broadcastBusesData = async () => {
 };
 
 function getAllBuses() {
-    return BusAPI.get('/Posicao');
+    return BusesApi.get('/Posicao');
 };
 
 async function getStationsByLineAndDirection(lineCode, direction) {
     try {
-        const { data: lines } = await BusAPI.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
+        const { data: lines } = await BusesApi.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
         const line = lines.find(line => line[OPERATION_MODE] === 10);
-        const { data: stations } = await BusAPI.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
+        const { data: stations } = await BusesApi.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
         return stations;
     } catch {
         return [];
@@ -168,6 +136,9 @@ module.exports = {
     broadcastBusesData,
     fetchAllData,
     sendBusesLineData,
+    getLines,
+    getBusesByLine,
+    getStationsByLineAndDirection,
     getWsConnections() {
         return wsConnections;
     },
@@ -182,8 +153,5 @@ module.exports = {
     },
     getGetBusesLines() {
         return busesLines;
-    },
-    getLines,
-    getBusesByLine,
-    getStationsByLineAndDirection
+    }
 };

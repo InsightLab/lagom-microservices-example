@@ -1,4 +1,6 @@
 const BusesService = require('../services/buses');
+const Trip = require('../models/Trip');
+const Stop = require('../models/Stop');
 const { LINE_NAME, STATIONS } = require('../services/utils/api-translation');
 
 module.exports = {
@@ -15,10 +17,26 @@ module.exports = {
         });
     },
     async getStationsByLineAndDirection(req, res) {
-        BusesService.getStationsByLineAndDirection(
-            req.params.lineCode, req.query.direction
-        ).then((data) => {
-            res.json(data[STATIONS]);
+        const { line, direction } = req.params;
+        Stop.find({
+            trips: `${line}-${+direction-1}`
+        })
+        .select('-_id -trips')
+        .exec((err, stops) => {
+            if (err) {
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'An error occurred in server. Try again.'
+                });
+            }
+
+            if (stops) {
+                res.json(stops);
+            } else {
+                res.status(404).json({
+                    message: 'No stops found with this line and direction.'
+                });
+            }
         });
     },
     handleStreamConnection(request) {
@@ -44,6 +62,30 @@ module.exports = {
         
         connection.on('close', () => {
             BusesService.removeWsConnection(connection.id);
+        });
+    },
+    getTripByLineAndDirection(req, res) {
+        const { line, direction } = req.params;
+        Trip.findOne({
+            route_id: line,
+            direction_id: parseInt(direction) - 1
+        })
+        .select('-_id')
+        .exec((err, trip) => {
+            if (err) {
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'An error occurred in server. Try again.'
+                });
+            }
+
+            if (trip) {
+                res.json(trip);
+            } else {
+                res.status(404).json({
+                    message: 'No trip found with this line and direction.'
+                });
+            }
         });
     }
 }
