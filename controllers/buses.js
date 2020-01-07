@@ -1,6 +1,5 @@
 const BusesService = require('../services/buses');
 const Trip = require('../models/Trip');
-const Stop = require('../models/Stop');
 const { LINE_NAME, STATIONS } = require('../services/utils/api-translation');
 
 module.exports = {
@@ -14,29 +13,6 @@ module.exports = {
         BusesService.getAllBuses()
         .then(({ data }) => {
             res.json(data.l); 
-        });
-    },
-    async getStationsByLineAndDirection(req, res) {
-        const { line, direction } = req.params;
-        Stop.find({
-            trips: `${line}-${+direction-1}`
-        })
-        .select('-_id -trips')
-        .exec((err, stops) => {
-            if (err) {
-                return res.status(500).json({
-                    status: 'error',
-                    message: 'An error occurred in server. Try again.'
-                });
-            }
-
-            if (stops) {
-                res.json(stops);
-            } else {
-                res.status(404).json({
-                    message: 'No stops found with this line and direction.'
-                });
-            }
         });
     },
     handleStreamConnection(request) {

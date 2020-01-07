@@ -1,4 +1,4 @@
-const BusesApi = require('./busesApi');
+const BusesApiConsumer = require('./busesApiConsumer');
 const { convertBusfromTheyToUs, convertLinefromTheyToUs } = require('./utils/buses');
 const {
     BUSES_BY_LINE,
@@ -19,7 +19,7 @@ let busesData = {}; // Cache of buses data
 const wsConnections = {}; // List of all websocket connections
 
 const getBusesByLine = line => {
-    return BusesApi.get(`/Posicao/Linha?codigoLinha=${line}`);
+    return BusesApiConsumer.get(`/Posicao/Linha?codigoLinha=${line}`);
 };
 
 const getLines = async () => {
@@ -117,15 +117,15 @@ const broadcastBusesData = async () => {
 };
 
 function getAllBuses() {
-    return BusesApi.get('/Posicao');
+    return BusesApiConsumer.get('/Posicao');
 };
 
-async function getStationsByLineAndDirection(lineCode, direction) {
+async function getStopsByLineAndDirection(lineCode, direction) {
     try {
-        const { data: lines } = await BusesApi.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
+        const { data: lines } = await BusesApiConsumer.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
         const line = lines.find(line => line[OPERATION_MODE] === 10);
-        const { data: stations } = await BusesApi.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
-        return stations;
+        const { data: stops } = await BusesApiConsumer.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
+        return stops;
     } catch {
         return [];
     }
@@ -138,7 +138,7 @@ module.exports = {
     sendBusesLineData,
     getLines,
     getBusesByLine,
-    getStationsByLineAndDirection,
+    getStopsByLineAndDirection,
     getWsConnections() {
         return wsConnections;
     },
