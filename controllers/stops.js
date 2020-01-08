@@ -1,5 +1,6 @@
 
 const Stop = require('../models/Stop');
+const BusService = require('../services/buses');
 
 module.exports = {
     async getStopsByLineAndDirection(req, res) {
@@ -25,7 +26,7 @@ module.exports = {
             }
         });
     },
-    async getStopsWithinCircle(req, res) {
+    getStopsWithinCircle(req, res) {
         const { coordinates, radius } = req.params;
         let [lng, lat] = coordinates.split(',');
         lat = parseFloat(lat);
@@ -43,7 +44,6 @@ module.exports = {
         .select('-_id -trips -location.type -location._id')
         .exec((err, stops) => {
             if (err) {
-                console.log(err);
                 return res.status(500).json({
                     status: 'error',
                     message: 'An error occurred in server. Try again.'
@@ -57,6 +57,14 @@ module.exports = {
                     message: 'No stops found with this line and direction.'
                 });
             }
+        });
+    },
+    getStopPrevisions(req, res) {
+        const { stopId } = req.params;
+
+        BusService.getStopPrevisions(stopId)
+        .then(lines => {
+            res.json(lines);
         });
     }
 };

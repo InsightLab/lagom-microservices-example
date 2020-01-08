@@ -7,7 +7,11 @@ const {
     LINE_CODE,
     DIRECTION,
     NUM_VEHICLES,
-    ACCESSIBLE
+    VEHICLES,
+    ACCESSIBLE,
+    PREDICTED_TIME,
+    TERMINAL_1,
+    TERMINAL_2
 } = require('./api-translation'); 
 
 const convertBusfromTheyToUs = (bus, busLine) => ({
@@ -16,14 +20,18 @@ const convertBusfromTheyToUs = (bus, busLine) => ({
     line: busLine,
     lat: bus[LAT],
     lng: bus[LNG],
-    accessible: bus[ACCESSIBLE]
+    accessible: bus[ACCESSIBLE],
+    predictedTime: bus[PREDICTED_TIME]
 });
 
 const convertLinefromTheyToUs = line => ({
     lineName: line[LINE_NAME],
     lineCode: line[LINE_CODE],
     direction: line[DIRECTION],
-    numVehicles: line[NUM_VEHICLES]
+    numVehicles: line[NUM_VEHICLES],
+    terminal1: line[TERMINAL_1],
+    terminal2: line[TERMINAL_2],
+    vehicles: line[VEHICLES] && line[VEHICLES].map(convertBusfromTheyToUs)
 });
 
 module.exports = {

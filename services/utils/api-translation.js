@@ -19,12 +19,14 @@ const translationEnum = {
     LAT: 'py',
     LNG: 'px',
     BUS_ID: 'p',
-    STATION_CODE: 'cp',
-    STATION_NAME: 'np',
+    STOP_CODE: 'cp',
+    STOP_NAME: 'np',
+    STOP: 'p',
     BUSES_BY_LINE: 'l',
     OPERATION_MODE: 'tl',
     CIRCULAR: 'lc',
-    STATIONS: 'ps'
+    STOPS: 'ps',
+    PREDICTED_TIME: 't'
 };
 
 module.exports = translationEnum;

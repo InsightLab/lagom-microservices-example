@@ -8,8 +8,9 @@ module.exports = app => {
 
     APIRouter.get('/buses-lines', BusesController.getBusesLines);
     APIRouter.get('/trip/:line/:direction', BusesController.getTripByLineAndDirection);
-    APIRouter.get('/buses-stops/:line/:direction', StopsController.getStopsByLineAndDirection);
     APIRouter.get('/buses-stops/within-circle/:coordinates/:radius', StopsController.getStopsWithinCircle);
+    APIRouter.get('/buses-stops/previsions/:stopId', StopsController.getStopPrevisions);
+    APIRouter.get('/buses-stops/:line/:direction', StopsController.getStopsByLineAndDirection);
     APIRouter.get('/buses', BusesController.getAllBuses);
 
     app.use('/api', APIRouter);

@@ -1,13 +1,13 @@
 const BusesService = require('../services/buses');
 const Trip = require('../models/Trip');
-const { LINE_NAME, STATIONS } = require('../services/utils/api-translation');
 
 module.exports = {
     async getBusesLines(req, res) {
         const busesLines = await BusesService.getLines();
         return res.json({
             busesLines
-        }); 
+        });
+
     },
     async getAllBuses(req, res) {
         BusesService.getAllBuses()

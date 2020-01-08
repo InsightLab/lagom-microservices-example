@@ -8,7 +8,8 @@ const {
     LINE_CODE,
     OPERATION_MODE,
     BUS_ID,
-    LINE_NAME
+    LINE_NAME,
+    STOP
 } = require('./utils/api-translation');
 const _ = require('lodash');
 
@@ -131,13 +132,27 @@ async function getStopsByLineAndDirection(lineCode, direction) {
     }
 };
 
+async function getStopPrevisions(stopId) {
+    let previsions;
+
+    try {
+        const { data } = await BusesApiConsumer.get(`/Previsao/Parada?codigoParada=${stopId}`);
+        previsions = data[STOP][BUSES_BY_LINE].map(convertLinefromTheyToUs);
+    } catch(e) {
+        return [];
+    }
+
+    return previsions;
+}
+
 module.exports = {
-    getAllBuses,
-    broadcastBusesData,
-    fetchAllData,
-    sendBusesLineData,
     getLines,
+    getAllBuses,
+    fetchAllData,
     getBusesByLine,
+    getStopPrevisions,
+    sendBusesLineData,
+    broadcastBusesData,
     getStopsByLineAndDirection,
     getWsConnections() {
         return wsConnections;
