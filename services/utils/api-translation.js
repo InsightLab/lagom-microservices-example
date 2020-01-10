@@ -14,6 +14,7 @@ const translationEnum = {
     NUM_VEHICLES: 'qv',
     VEHICLES: 'vs',
     ACCESSIBLE: 'a',
+    SIGN_TEXT: 'lt',
     DATETIME: 'ta',
     HOUR: 'hr',
     LAT: 'py',

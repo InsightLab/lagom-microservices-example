@@ -1,4 +1,5 @@
 const BusesService = require('../services/buses');
+const { BUSES_BY_LINE } = require('../services/utils/buses');
 const Trip = require('../models/Trip');
 
 module.exports = {
@@ -7,12 +8,18 @@ module.exports = {
         return res.json({
             busesLines
         });
-
     },
-    async getAllBuses(req, res) {
+    getAllBuses(req, res) {
         BusesService.getAllBuses()
         .then(({ data }) => {
-            res.json(data.l); 
+            res.json(data[BUSES_BY_LINE]); 
+        });
+    },
+    searchLines(req, res) {
+        const { q } = req.query;
+        BusesService.searchLines(q)
+        .then((lines) => {
+            res.json(lines); 
         });
     },
     handleStreamConnection(request) {

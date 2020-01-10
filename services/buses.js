@@ -145,9 +145,26 @@ async function getStopPrevisions(stopId) {
     return previsions;
 }
 
+async function searchLines(searchString) {
+    let lines;
+
+    try {
+        const { data } = await BusesApiConsumer.get(`/Linha/Buscar?termosBusca=${searchString}`);
+        lines = data.map(convertLinefromTheyToUs)
+        lines = _.groupBy(lines, ({ signText, operationMode }) => {
+            return `${signText}-${operationMode}`;
+        });
+    } catch(e) {
+        return [];
+    }
+
+    return lines;
+}
+
 module.exports = {
     getLines,
     getAllBuses,
+    searchLines,
     fetchAllData,
     getBusesByLine,
     getStopPrevisions,
