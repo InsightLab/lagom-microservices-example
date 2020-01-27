@@ -1,67 +1,40 @@
 const BusesApiConsumer = require('./busesApiConsumer');
-const { convertBusfromTheyToUs, convertLinefromTheyToUs } = require('./utils/buses');
-const {
-    BUSES_BY_LINE,
-    VEHICLES,
-    TERMINAL_1,
-    TERMINAL_2,
-    LINE_CODE,
-    OPERATION_MODE,
-    BUS_ID,
-    LINE_NAME,
-    STOP
-} = require('./utils/api-translation');
+const { convertLinefromTheyToUs } = require('./utils/buses');
+const { BUSES_BY_LINE, STOP } = require('./utils/api-translation');
 const _ = require('lodash');
 
-let busesLines = [];
+let busesLines = []; // Cache of buses lines data
 
 let busesData = {}; // Cache of buses data
 
 const wsConnections = {}; // List of all websocket connections
 
-const getBusesByLine = line => {
-    return BusesApiConsumer.get(`/Posicao/Linha?codigoLinha=${line}`);
-};
 
 const getLines = async () => {
     if (busesLines.length === 0) {
         try {
-            const { data } = await getAllBuses();
-            const lines = data[BUSES_BY_LINE];
+            const lines = await getAllBuses();
             const busesByLines = _.groupBy(
                 lines.map(line => ({
                     ...line,
-                    [VEHICLES]: undefined
+                    vehicles: undefined
                 })),
-                LINE_NAME
+                'lineName'
             );
 
             busesLines = Object.keys(busesByLines).map(lineName => ({
                 lineName,
-                terminal1: busesByLines[lineName][0][TERMINAL_1],
-                terminal2: busesByLines[lineName][0][TERMINAL_2],
-                sublines: busesByLines[lineName].map(line => convertLinefromTheyToUs(line))
+                terminal1: busesByLines[lineName][0].terminal1,
+                terminal2: busesByLines[lineName][0].terminal2,
+                sublines: busesByLines[lineName]
             }));
-        } catch (e) {
+        } catch {
             busesLines = [];
         }
     }
 
     return busesLines;
 };
-
-const getDataByLine = async busLine => {
-    if (busLine) {
-        try {
-            const { data } = await getBusesByLine(busLine);
-            busesData[busLine] = data[VEHICLES].map(bus => convertBusfromTheyToUs(bus));
-        } catch (e) {
-            busesData[busLine] = [];
-            console.error(new Error(`An error occurred in fetch the buses data of line ${busLine}.`));
-        }
-    }
-};
-
 
 function _computeAngle([ax, ay], [bx, by]) {
     return (Math.atan2(by - ay, bx - ax) * 180 / Math.PI);
@@ -70,24 +43,23 @@ function _computeAngle([ax, ay], [bx, by]) {
 const fetchAllData = async () => {
     let busesLines = [];
     try {
-        const { data } = await getAllBuses();
-        busesLines = data[BUSES_BY_LINE];
-    } catch(e) {
+        busesLines = await getAllBuses();
+    } catch {
         console.error(new Error('An error occurred in fetch some bus data.'));
     }
 
     busesLines.forEach((busLine) => {
-        if (Array.isArray(busesData[busLine[LINE_CODE]])) {
-            busesData[busLine[LINE_CODE]] = busesData[busLine[LINE_CODE]].sort((b1, b2) => b1.busId - b2.busId);
+        if (Array.isArray(busesData[busLine.lineCode])) {
+            busesData[busLine.lineCode] = busesData[busLine.lineCode].sort((b1, b2) => b1.busId - b2.busId);
         } else {
-            busesData[busLine[LINE_CODE]] = [];
+            busesData[busLine.lineCode] = [];
         }
 
-        busesData[busLine[LINE_CODE]] = busLine[VEHICLES]
-        .sort((b1, b2) => b1[BUS_ID] - b2[BUS_ID])
+        busesData[busLine.lineCode] = busLine.vehicles
+        .sort((b1, b2) => b1.busId - b2.busId)
         .map((bus, i) => {
-            const newBus = convertBusfromTheyToUs(bus);
-            const oldBus = busesData[busLine[LINE_CODE]][i];
+            const newBus = bus;
+            const oldBus = busesData[busLine.lineCode][i];
             let rotationAngle = 0;
 
             if (oldBus) {
@@ -117,16 +89,11 @@ const broadcastBusesData = async () => {
     }
 };
 
-function getAllBuses() {
-    return BusesApiConsumer.get('/Posicao');
-};
-
-async function getStopsByLineAndDirection(lineCode, direction) {
+async function getAllBuses() {
     try {
-        const { data: lines } = await BusesApiConsumer.get(`/Linha/BuscarLinhaSentido?termosBusca=${lineCode}&sentido=${direction}`);
-        const line = lines.find(line => line[OPERATION_MODE] === 10);
-        const { data: stops } = await BusesApiConsumer.get(`/Previsao/Linha?codigoLinha=${line[LINE_CODE]}`);
-        return stops;
+        const { data } = await BusesApiConsumer.get('/Posicao');
+        const lines = data[BUSES_BY_LINE].map(convertLinefromTheyToUs);
+        return lines;
     } catch {
         return [];
     }
@@ -138,7 +105,7 @@ async function getStopPrevisions(stopId) {
     try {
         const { data } = await BusesApiConsumer.get(`/Previsao/Parada?codigoParada=${stopId}`);
         previsions = data[STOP][BUSES_BY_LINE].map(convertLinefromTheyToUs);
-    } catch(e) {
+    } catch {
         return [];
     }
 
@@ -154,7 +121,7 @@ async function searchLines(searchString) {
         lines = _.groupBy(lines, ({ signText, operationMode }) => {
             return `${signText}-${operationMode}`;
         });
-    } catch(e) {
+    } catch {
         return [];
     }
 
@@ -166,11 +133,9 @@ module.exports = {
     getAllBuses,
     searchLines,
     fetchAllData,
-    getBusesByLine,
     getStopPrevisions,
     sendBusesLineData,
     broadcastBusesData,
-    getStopsByLineAndDirection,
     getWsConnections() {
         return wsConnections;
     },

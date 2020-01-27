@@ -42,6 +42,7 @@ const convertLinefromTheyToUs = line => ({
     vehicles: line[VEHICLES] && line[VEHICLES].map(convertBusfromTheyToUs)
 });
 
+
 module.exports = {
     convertBusfromTheyToUs,
     convertLinefromTheyToUs

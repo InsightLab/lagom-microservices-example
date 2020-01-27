@@ -28,7 +28,7 @@ BusesAPIConsumer.interceptors.response.use(
                 }   
 
                 return axios(originalRequest);
-            } catch(e) {
+            } catch {
                 return axios(originalRequest);
             }
         }

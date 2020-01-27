@@ -1,5 +1,5 @@
 const BusesService = require('../services/buses');
-const { BUSES_BY_LINE } = require('../services/utils/buses');
+const { BUSES_BY_LINE } = require('../services/utils/api-translation');
 const Trip = require('../models/Trip');
 
 module.exports = {
@@ -11,8 +11,8 @@ module.exports = {
     },
     getAllBuses(req, res) {
         BusesService.getAllBuses()
-        .then(({ data }) => {
-            res.json(data[BUSES_BY_LINE]); 
+        .then(data => {
+            res.json(data); 
         });
     },
     searchLines(req, res) {
