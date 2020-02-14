@@ -8,6 +8,7 @@ import br.ufc.insightlab.spbus.api.{SPBusClientService, SPBusService}
 import br.ufc.insightlab.spbus.repository.api.{StopsRepository, TripsRepository}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.api.transport.ResponseHeader
+import play.api.Configuration
 import play.api.http.HeaderNames.{COOKIE, SET_COOKIE}
 import play.api.libs.json._
 
@@ -20,11 +21,14 @@ import scala.util.{Failure, Success}
   * Implementation of the SPBusService.
   */
 class SPBusServiceImpl(spBusClientService: SPBusClientService,
+                       config: Configuration,
                        val stopsRepository: StopsRepository,
                        val tripsRepository: TripsRepository,
                        val busLineManager: BusLineManager)
                       (implicit materializer: Materializer) extends SPBusService {
   import SPBusServiceImpl._
+
+  val appToken = config.get[String]("apiOlhoVivoToken")
 
   busLineManager.startProducing(internalFindAllBuses)
 
@@ -133,7 +137,6 @@ class SPBusServiceImpl(spBusClientService: SPBusClientService,
 }
 
 object SPBusServiceImpl {
-  val appToken = "5fac898bec6a93d9a677f5db90e77ffe98ac1c23048359d14f2ca92a0c709f4b"
   var apiCredentials = ""
 
   def processCookies(cookies: String): Map[String, String] = {

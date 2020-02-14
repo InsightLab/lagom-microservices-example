@@ -32,7 +32,6 @@ const StopsMarkers: FunctionComponent<StopsMarkersProps> = ({ stops, visible }) 
         }
     }
 
-
     function fetchPrevisions(stopId: number) {
         BusService.getStopPrevision(stopId)
         .then(({ data }) => {
