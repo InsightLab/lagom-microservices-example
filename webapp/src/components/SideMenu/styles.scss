@@ -1,0 +1,87 @@
+@import '../../defaults.scss';
+
+$menu-size: 70px;
+
+.side-menu-container {
+    width: $menu-size;
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: $break-md) {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .menu-icon {
+        width: $menu-size;
+        height: $menu-size;
+        display: flex;
+        justify-content: space-around;
+        padding: 1.3rem 0 1.3rem 0;
+        flex-direction: column;
+        transition: background 0.2s ease-out;
+        cursor: pointer;
+
+        .menu-icon-line {
+            width: 50%;
+            height: 2px;
+            background: #fff;
+            display: block;
+            margin: auto;
+            border-radius: 0.1rem;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+
+            @media (max-width: $break-md) {
+                display: none;
+            }
+        }
+
+        @media (max-width: $break-md) {
+            width: $menu-size * 0.8;
+            height: $menu-size * 0.8;
+        }
+
+        &:hover {
+            background: rgba(0,0,0,0.1);
+        }
+    }
+
+
+    &.open .menu-icon .menu-icon-line {
+        &:nth-child(1) {
+            transform-origin: 50% 0;
+            transform: translateY(10px) rotate(45deg);
+        }
+
+        &:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        &:nth-child(3) {
+            transform-origin: 50% 0;
+            transform: translateY(-8px) rotate(-45deg);
+        }
+    }
+
+    .side-menu-body {
+        flex: 1;
+    }
+
+    .side-menu-footer {
+        padding: 0.5rem;
+
+        img {
+            width: 100%;
+        }
+
+        @media (max-width: $break-md) {
+            padding: 0 0.5rem;
+
+            img {
+                width: 50px;
+            }
+        }
+    }
+}

@@ -1,0 +1,116 @@
+@import '../../defaults.scss';
+
+.bus-map-wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    transition: transform 0.3s ease-in-out;
+
+    &.menu-open {
+        transform: translateX($menu-size);
+    }
+}
+
+.buses-map-accessibility-tooltip {
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.buses-map {
+    flex: 1;
+    position: relative;
+    z-index: 0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 0.5rem 0 rgba(0, 0, 0, 0.2);
+
+    .bus-route-path {
+        stroke: url(#primary-gradient);
+    }
+
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .buses-map-bus-popup,
+    .buses-map-stop-popup {
+
+        .leaflet-popup-content-wrapper {
+            box-shadow: 0rem 1.1rem 0.8rem -0.9rem rgba(0, 0, 0, 0.2);
+            border-radius: 0.4rem;
+            background: $default-bg;
+            position: relative;
+
+            &:after, &:before {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border: 1px solid $primary-color;
+                top: 0;
+                left: 0;
+                border-radius: inherit;
+                transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+                z-index: -1;
+            }
+
+            &:after {
+                transform: scale(1.1);
+                opacity: 0;
+                animation: pulse-animation 2s infinite;
+            }
+
+            &:before {
+                transform: scale(1);
+                opacity: 0.8;
+                transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+                animation: pulse-animation 2s infinite 0.2s;
+            }
+
+            .leaflet-popup-content {
+                margin: 0 1rem;
+            }
+
+            tr {
+                margin: 0.5rem 0;
+            }
+        }
+
+        .leaflet-popup-tip-container {
+            display: none;
+        }
+
+        .bus-info-header {
+            text-align: right;
+            color: $primary-color;
+        }
+    }
+
+    .buses-map-bus-popup {
+        .leaflet-popup-content-wrapper {
+            padding: 0.8rem;
+            
+            tr {
+                padding: 0.5rem 0;
+            }
+
+            .bus-info-header {
+                display: block;
+                padding: 0.2rem 0;
+                margin-right: 0.4rem;
+            }
+        }
+    }
+
+    .buses-map-current-position {
+        fill: darken($primary-color, 30%);
+        stroke: darken($primary-color, 30%);
+        position: relative;
+    }
+}

@@ -1,0 +1,30 @@
+@import '../../defaults.scss';
+
+.overlay-loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+
+    &::after {
+        content: '';
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 125vmax;
+        height: 125vmax;
+        background: white;
+        border-radius: 50%;
+        opacity: 1;
+        transition: transform 1s ease-out, opacity 0.3s ease-out;
+        will-change: transform;
+        transform: translate(-50%, -50%) scale(1, 1);
+    }
+
+    &.loaded::after {
+        transform: translate(90%, 90%) scale(0, 0);
+        opacity: 0;
+    }
+}

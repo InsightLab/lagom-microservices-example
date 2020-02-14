@@ -1,0 +1,69 @@
+@import '../../defaults.scss';
+
+$card-size: 400px;
+
+.floater-card-wrapper {
+    position: absolute;
+    z-index: 1;
+}
+
+.floater-card {
+    position: absolute;
+    background: white;
+    padding: 1rem;
+    max-width: $card-size;
+    min-width: $card-size;
+    z-index: 1;
+    // border: 2px solid $primary-color;
+    border-radius: 0.2rem;
+    overflow: hidden;
+    transition: transform 0.2s linear,
+                opacity 0.1s ease-in;
+
+    .floater-card-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    &::after, &::before {
+        content: '';
+        position: absolute;
+        border-radius: inherit;
+        border-radius: 0.2rem;
+    }
+
+    &::after {
+        left: 50%;
+        top: 50%;
+        border-radius: 50%;
+        width: $card-size * 2;
+        height: $card-size * 2;
+        background: $default-bg;
+        transition: transform 1s ease-in-out;
+        transform: scale(1, 1) translate(-50%, -50%);
+        z-index: 0;
+    }
+    
+    &:hover::after {
+        transform: scale(0, 0) translate(-50%, -50%);
+    }
+
+    &::before {
+        border: 1px solid rgba($primary-color, 0.5);
+        z-index: 0;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+.react-draggable-dragging .floater-card {
+    box-shadow: -5rem 5rem 1.5rem 0 rgba(0, 0, 0, 0.1);
+    transform: rotate(-3deg);
+}
+
+body.leaflet-dragging .floater-card {
+    opacity: 0.4;
+}

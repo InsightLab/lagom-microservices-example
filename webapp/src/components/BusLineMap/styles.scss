@@ -1,0 +1,50 @@
+@import '../../defaults.scss';
+
+.bus-map-wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    transition: transform 0.3s ease-in-out;
+
+    &.menu-open {
+        transform: translateX($menu-size);
+    }
+
+    @media (max-width: $break-md) {
+        padding: 0.5rem !important;
+    }
+}
+
+.buses-map-accessibility-tooltip {
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.buses-map {
+    flex: 1;
+    position: relative;
+    z-index: 0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 0.5rem 0 rgba(0, 0, 0, 0.2);
+
+    .bus-route-path {
+        stroke: url(#primary-gradient);
+    }
+
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .buses-map-current-position {
+        fill: darken($primary-color, 30%);
+        stroke: darken($primary-color, 30%);
+        position: relative;
+    }
+}

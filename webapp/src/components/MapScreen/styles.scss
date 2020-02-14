@@ -1,0 +1,60 @@
+@import '../../defaults.scss';
+
+.main-floater-card {
+    .handle {
+        padding: 1rem 0;
+        margin-top: -1rem;
+
+        h2 {
+            color: darken($primary-color, 5%);
+            font-size: 1.2rem;
+            cursor: grab;
+            margin-bottom: 0;
+
+            &:active {
+                cursor: grabbing;
+            }
+        }
+        
+    }
+
+    p {
+        margin-top: 0.6rem;
+        font-size: 0.8rem;
+        color: #666;
+    }
+}
+
+.app-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    @media (max-width: $break-md) {
+        flex-direction: column-reverse;
+    }
+}
+
+.circle-radius-slider-wrapper {
+    position: relative;
+    padding: 0px 30px;
+
+    .anticon {
+        position: absolute;
+        top: -2px;
+        width: 16px;
+        height: 16px;
+        line-height: 1;
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.25);
+    }
+    
+    .anticon:first-child {
+        left: 0;
+    }
+    
+    .anticon:last-child {
+        right: 0;
+    }
+}
+  

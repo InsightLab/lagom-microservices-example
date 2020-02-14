@@ -1,0 +1,57 @@
+@import '../../defaults.scss';
+
+.map-border {
+    $border-width: 0.1rem;
+
+    position: absolute;
+    background: lighten($primary-color, 30%);
+    z-index: 1999;
+    opacity: 0;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+
+    &.map-border-top, 
+    &.map-border-bottom {
+        height: $border-width;
+        width: 100%;
+        left: 0;
+        transform: scaleX(0);
+    }
+
+    &.map-border-left, 
+    &.map-border-right {
+        width: $border-width;
+        height: 100%;
+        top: 0;
+        transform: scaleY(0);
+    }
+
+    &.map-border-top {
+        top: 0;
+    }
+
+    &.map-border-bottom {
+        bottom: 0;
+    }
+
+    &.map-border-left {
+        left: 0;
+    }
+
+    &.map-border-right {
+        right: 0;
+    }
+}
+
+body.leaflet-dragging .map-border {
+    opacity: 1;
+
+    &.map-border-top, 
+    &.map-border-bottom {
+        transform: scaleX(1);
+    }
+
+    &.map-border-left, 
+    &.map-border-right {
+        transform: scaleY(1);
+    }
+}

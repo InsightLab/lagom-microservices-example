@@ -1,0 +1,35 @@
+@import "../../../defaults.scss";
+
+.busline-selector {
+    margin-top: 0.5rem !important;
+    font-size: 1.1rem;
+    width: 100%;
+}
+
+.bus-direction-toggle {
+    display: flex;
+    margin-top: 0.5rem;
+
+    .bus-direction-toggle-limits {
+        display: inline-flex;
+        flex-grow: 1;
+        justify-content: center;
+        align-items: center;
+        padding-right: 0.5rem;
+    }
+    
+    .bus-limit {
+        display: inline;
+        padding: 0.35rem 0.4rem 0 0.4rem;
+        border-radius: 0.3rem;
+        border: 1px solid #ccc;
+        vertical-align: middle;
+        flex-grow: 1;
+        font-size: 0.9rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        height: 100%;
+        max-width: 50%;
+    }
+}
