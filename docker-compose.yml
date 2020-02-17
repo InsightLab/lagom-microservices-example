@@ -8,8 +8,6 @@ services:
     environment:
       - API_OLHO_VIVO_TOKEN=${API_OLHO_VIVO_TOKEN}
       - MONGO_HOST=mongo
-    ports:
-      - "${SERVER_PORT}:5000"
     links:
       - mongo
     depends_on:
@@ -35,12 +33,9 @@ services:
     container_name: webapp
     image: webapp
     build: ./webapp
-    environment:
-      - REACT_APP_SERVER_HOST:"${microservices-example-node}:${SERVER_PORT}"
     depends_on:
       - "node"
-    ports:
-      - "80:80"
+
   mongo:
     container_name: mongo
     image: mongo
@@ -48,4 +43,9 @@ services:
       - /tmp/microservices-example-node/data:/data/db
     ports:
       - "27017:27017"
-      
+
+  proxy:
+    image: nginx_balancer
+    build: ./proxy
+    ports:
+      - 80:80

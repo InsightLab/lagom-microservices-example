@@ -5,5 +5,3 @@ WORKDIR /app
 COPY . .
 
 RUN pip install requests pymongo
-
-CMD [ "ls" ]

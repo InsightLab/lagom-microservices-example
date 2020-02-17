@@ -74,7 +74,7 @@ mongo_db = mongo_client[os.environ['MONGO_DB']]
 stops_col = mongo_db['stops']
 trips_col = mongo_db['trips']
 
-stops_col.delete_many()
+stops_col.delete_many({})
 stops_col.insert_many(stops_with_lines)
-trips_col.delete_many()
-trips_col.delete_many(trips_with_shapes)
+trips_col.delete_many({})
+trips_col.insert_many(trips_with_shapes)
