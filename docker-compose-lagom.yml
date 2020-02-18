@@ -4,5 +4,6 @@ services:
     image: spbus-impl:1.0-SNAPSHOT
     environment:
       - MONGO_HOST=mongo
+      - API_OLHO_VIVO_TOKEN=${API_OLHO_VIVO_TOKEN}
     volumes:
       - ./lagom-api/spbus-impl/src/main/overrides/:/opt/conf/
