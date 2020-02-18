@@ -51,3 +51,7 @@ Com a imagem publicada, basta iniciar os serviços:
 ```sh
 docker-compose -f common-services.yml -f docker-compose-lagom.yml up
 ```
+
+## Acessando a aplicação Web
+
+Com todos os serviços no ar, basta acessar http://localhost/ no navegador.
