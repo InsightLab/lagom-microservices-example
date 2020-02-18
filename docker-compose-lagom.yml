@@ -5,5 +5,6 @@ services:
     environment:
       - MONGO_HOST=mongo
       - API_OLHO_VIVO_TOKEN=${API_OLHO_VIVO_TOKEN}
+      - APPLICATION_SECRET=${APPLICATION_SECRET}
     volumes:
       - ./lagom-api/spbus-impl/src/main/overrides/:/opt/conf/
