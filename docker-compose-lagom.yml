@@ -1,0 +1,8 @@
+version: "3"
+services:
+  server:
+    image: spbus-impl:1.0-SNAPSHOT
+    environment:
+      - MONGO_HOST=mongo
+    volumes:
+      - ./spbus-impl/src/main/overrides/:/opt/conf/

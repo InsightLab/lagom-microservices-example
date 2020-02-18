@@ -13,14 +13,14 @@ import com.softwaremill.macwire._
 import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.mvc.EssentialFilter
 import play.filters.cors.CORSComponents
+import com.lightbend.lagom.scaladsl.akka.discovery.AkkaDiscoveryComponents
 
 import scala.concurrent.Future
 
 class SPBusLoader extends LagomApplicationLoader {
   override def load(context: LagomApplicationContext): LagomApplication =
-    new SPBusApplication(context) {
-      override def serviceLocator: ServiceLocator = NoServiceLocator
-    }
+    new SPBusApplication(context)
+      with AkkaDiscoveryComponents
 
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new SPBusApplication(context) with LagomDevModeComponents

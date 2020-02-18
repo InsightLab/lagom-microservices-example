@@ -1,0 +1,16 @@
+version: "3"
+services:
+  server:
+    container_name: microservices-example-node
+    restart: always
+    image: microservices-example-node:prod
+    build: ./nodejs-api
+    environment:
+      - API_OLHO_VIVO_TOKEN=${API_OLHO_VIVO_TOKEN}
+      - MONGO_HOST=mongo
+      - PORT=9000
+    links:
+      - mongo
+    depends_on:
+      - "data-seed"
+      - "mongo"

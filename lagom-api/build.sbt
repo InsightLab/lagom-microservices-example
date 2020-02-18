@@ -1,3 +1,5 @@
+import com.typesafe.sbt.SbtNativePackager.autoImport.packageName
+
 organization in ThisBuild := "br.ufc.insightlab"
 version in ThisBuild := "1.0-SNAPSHOT"
 
@@ -7,6 +9,9 @@ scalaVersion in ThisBuild := "2.12.7"
 /** Libraries */
 val reactiveMongo = "org.reactivemongo" % "play2-reactivemongo_2.12" % "0.18.7-play26"
 val akkaQuartzScheduler = "com.enragedginger" %% "akka-quartz-scheduler" % "1.8.2-akka-2.6.x"
+val macwire = "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
+val akkaDiscovery = "com.lightbend.lagom" %% "lagom-scaladsl-akka-discovery-service-locator" % "1.0.0"
+
 val akkaVersion = "2.6.3"
 
 dependencyOverrides ++= Seq(
@@ -36,6 +41,10 @@ dependencyOverrides ++= Seq(
   "com.typesafe.akka" %% "akka-actor-testkit-typed"    % akkaVersion % Test
 )
 
+lagomUnmanagedServices in ThisBuild := Map(
+  "spbus-client" -> "http://api.olhovivo.sptrans.com.br/v2.1"
+)
+
 lazy val `spbus` = (project in file("."))
   .aggregate(`spbus-api`, `spbus-impl`)
 lazy val `spbus-api` = (project in file("spbus-api"))
@@ -47,59 +56,17 @@ lazy val `spbus-api` = (project in file("spbus-api"))
   )
 
 lazy val `spbus-impl` = (project in file("spbus-impl"))
-  .enablePlugins(LagomScala)
+  .enablePlugins(LagomScala, JavaAppPackaging, DockerPlugin)
   .settings(
+    dockerExposedPorts ++= Seq(9000, 9001),
     libraryDependencies ++= Seq(
       lagomScaladslPersistenceCassandra,
       lagomScaladslKafkaBroker,
       filters,
       akkaQuartzScheduler,
       macwire,
-      reactiveMongo
+      reactiveMongo,
+      akkaDiscovery
     )
   )
   .dependsOn(`spbus-api`)
-
-lagomUnmanagedServices in ThisBuild := Map(
-  "bmap-client" -> "http://dadosabertos.rio.rj.gov.br/apiTransporte/apresentacao/rest/index.cfm",
-  "spbus-client" -> "http://api.olhovivo.sptrans.com.br/v2.1"
-)
-
-lazy val `bmap` = (project in file("."))
-  .aggregate(`bmap-api`, `bmap-impl`, `bmap-stream-api`, `bmap-stream-impl`)
-
-lazy val `bmap-api` = (project in file("bmap-api"))
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
-  )
-
-lazy val `bmap-impl` = (project in file("bmap-impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslPersistenceCassandra,
-      lagomScaladslKafkaBroker,
-      macwire
-    )
-  )
-  .settings(lagomForkedTestSettings)
-  .dependsOn(`bmap-api`)
-val macwire = "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
-
-lazy val `bmap-stream-api` = (project in file("bmap-stream-api"))
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
-  ).dependsOn(`bmap-api`)
-
-lazy val `bmap-stream-impl` = (project in file("bmap-stream-impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      macwire
-    )
-  )
-  .dependsOn(`bmap-stream-api`, `bmap-api`)

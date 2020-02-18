@@ -35,7 +35,7 @@ trait SPBusService extends Service {
         pathCall("/api/sp/buses-stops/previsions/:stopId", getStopPrevisions _),
         pathCall("/api/sp/buses-stops/within-circle/:coordinates/:radius", getStopsWithinCircle _),
         pathCall("/api/sp/buses-stops/:line/:direction", getStopsByLineAndDirection _),
-        pathCall("/", busesPositionsStream)
+        pathCall("/ws", busesPositionsStream)
       )
       .withAutoAcl(true)
     // @formatter:on

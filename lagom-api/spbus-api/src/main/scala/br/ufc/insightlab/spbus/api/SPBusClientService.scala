@@ -16,10 +16,10 @@ trait SPBusClientService extends Service {
 
     named("spbus-client")
       .withCalls(
-        restCall(POST, "/Login/Autenticar?token", authenticate _),
-        restCall(GET, "/Posicao", findAllBuses _),
-        restCall(GET, "/Previsao/Parada?codigoParada", getStopPrevisions _),
-        restCall(GET, "/Linha/Buscar?termosBusca", searchLines _)
+        restCall(POST, "/v2.1/Login/Autenticar?token", authenticate _),
+        restCall(GET, "/v2.1/Posicao", findAllBuses _),
+        restCall(GET, "/v2.1/Previsao/Parada?codigoParada", getStopPrevisions _),
+        restCall(GET, "/v2.1/Linha/Buscar?termosBusca", searchLines _)
       )
       .withAutoAcl(true)
   }

@@ -60,15 +60,6 @@ for stop_id in lines_by_stop.groups:
         }
     })
 
-with open(RESULT_DIR + '/stops.json', 'w', encoding='utf8') as outfile:
-  json.dump(stops_with_lines, outfile, ensure_ascii=False,
-            allow_nan=False)
-
-with open(RESULT_DIR + '/trips.json', 'w', encoding='utf8') as outfile:
-  json.dump(trips_with_shapes, outfile, ensure_ascii=False)
-
-
-
 mongo_client = pymongo.MongoClient(os.environ['MONGO_HOST'], int(os.environ['MONGO_PORT']))
 mongo_db = mongo_client[os.environ['MONGO_DB']]
 stops_col = mongo_db['stops']

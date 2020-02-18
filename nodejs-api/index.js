@@ -23,7 +23,7 @@ app.use(cookieParser());
 setRestRoutes(app);
 setWsRoutes(wsServer);
 
-server.listen(5000, async () => {
+server.listen(process.env.PORT || 5000, async () => {
     setInterval(broadcastBusesData, JOB_TIMEOUT);
     await broadcastBusesData();
 
