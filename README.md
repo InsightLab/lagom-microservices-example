@@ -1,5 +1,4 @@
 # lagom-microservices-example
-Lagom Microservices Example
 
 ## Iniciar serviços
 
