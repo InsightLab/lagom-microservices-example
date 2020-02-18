@@ -1,9 +1,9 @@
 # Aplicação Demo
 
-Esta aplicação foi criado com o intuito de demonstrar as diferenças e características entre aplicações monolíticas e as que seguem a arquitetura de microsserviços, representadas respectivamente pelas tecnlogias [Node.js](https://nodejs.org/en/) e [Lagom](https://www.lagomframework.com/) em sua versão para a linguagem Scala.
+Esta aplicação foi criado com o intuito de demonstrar as diferenças e características entre aplicações monolíticas e as que seguem a arquitetura de microsserviços, representadas respectivamente pelas tecnologias [Node.js](https://nodejs.org/en/) e [Lagom](https://www.lagomframework.com/) em sua versão para a linguagem Scala.
 
 ## Pré-requisitos
-Ter instalado
+Possuir instalados
 - [sbt](https://www.scala-sbt.org/)
 - [docker](https://www.docker.com/)
 - [docker-compose](https://docs.docker.com/compose/)
@@ -28,7 +28,7 @@ docker-compose -f common-services.yml -f docker-compose-node.yml up
 
 No caso da aplicação Lagom, antes de iniciar os serviços é necessário gerar a imagem do microsserviço utilizando o módulo [`sbt-native-packager`](https://www.scala-sbt.org/sbt-native-packager/formats/docker.html).
 
-Para isso acesse o diretório do projeto e execute do comando responsável por publicar a imagem localmente:
+Para isso acesse o diretório do projeto e execute o comando responsável por publicar a imagem localmente:
 
 ```sh
 cd lagom-api
