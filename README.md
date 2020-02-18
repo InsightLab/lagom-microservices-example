@@ -5,10 +5,10 @@
 ### Utilizando Node.js como servidor
 
 ```sh
-docker-compose -f common-services.yml -f docker-compose-lagom.yml up
+docker-compose -f common-services.yml -f docker-compose-node.yml up
 ```
 
-### Utilizando Node.js como servidor
+### Utilizando Lagom como servidor
 
 ```sh
 docker-compose -f common-services.yml -f docker-compose-lagom.yml up
