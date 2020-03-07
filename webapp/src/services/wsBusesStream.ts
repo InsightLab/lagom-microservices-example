@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
 import { Bus, MessageCallback } from "../types/index";
 
-let wsBusesStream = new WebSocket(`ws://${window.location.host}/ws`);
+let baseURL = `${window.location.host}/ws`;
+
+if (process.env.REACT_APP_SERVER_HOST) {
+    baseURL = `${process.env.REACT_APP_SERVER_HOST}`;
+}
+
+let wsBusesStream = new WebSocket(`ws://${baseURL}/`);
 
 function handleMessages(message: MessageEvent) {
     let data: Bus[] = [];
