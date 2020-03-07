@@ -13,7 +13,7 @@ Possuir instalados
 - [Node.js](https://nodejs.org/en/) versão 10.0 ou superior
 - [Yarn](https://classic.yarnpkg.com/en/docs/install) versão 1.22 ou superior
 - [MongoDB](https://www.docker.com/) versão 4.0 ou superior
-- [Python 3](https://www.python.org/downloads/) com a bibliotecas `Pandas`, `Requests` e `Pymongo` já instaladas. Você pode configurar um ambiente do [Miniconda](https://docs.conda.io/en/latest/miniconda.html) se preferir.
+- [Python 3](https://www.python.org/downloads/) com as bibliotecas `Pandas`, `Requests` e `Pymongo` já instaladas. Você pode configurar um ambiente do [Miniconda](https://docs.conda.io/en/latest/miniconda.html), se preferir.
 
 ### Iniciando Servidor Node.js
 
