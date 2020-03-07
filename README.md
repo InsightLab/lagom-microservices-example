@@ -19,7 +19,7 @@ Possuir instalados
 
 #### Passo 1
 
-Inicie o MongoDB na sua máquina e se certique que ele está disponível no host `localhost` e na porta `27017`, essas são as portas padrões. Caso contrário, você deve modificar essas configurações no servidor no passo a seguir.
+Inicie o MongoDB na sua máquina e se certique que ele está disponível no host `localhost` e na porta `27017`, essas são as configurações padrões. Caso contrário, você deve modificar essas configurações no servidor no passo a seguir.
 
 #### Passo 2
 
@@ -41,7 +41,7 @@ Entre na pasta `/nodejs-api` copie todo o conteúdo do arquivo `.env.example` pa
 
 #### Passo 4
 
-Instale os módulos necessários. Já dentro da paste `/nodejs-api` execute o seguinte comando:
+Instale os módulos necessários. Já dentro da pasta `/nodejs-api` execute o seguinte comando:
 
 ```sh
 yarn
@@ -59,7 +59,7 @@ node index.js
 
 #### Passo 1
 
-Entre na pasta `/nodejs-api` crie o arquivo `.env.development.local` com o seguinte conteúdo:
+Entre na pasta `/webapp` e crie o arquivo `.env.development.local` com o seguinte conteúdo:
 
 ```.env
 REACT_APP_SERVER_HOST=localhost:5000
@@ -67,7 +67,7 @@ REACT_APP_SERVER_HOST=localhost:5000
 
 #### Passo 2
 
-Instale os módulos necessários. Já dentro da paste `/webapp` execute o seguinte comando:
+Instale os módulos necessários. Já dentro da pasta `/webapp`, execute o seguinte comando:
 
 ```sh
 yarn
@@ -75,7 +75,7 @@ yarn
 
 #### Passo 3
 
-Inicie o servidor como mostrado na seção anterior.
+Inicie o servidor como mostrado na [seção anterior](#iniciando-servidor-node.js).
 
 #### Passo 4
 
