@@ -75,7 +75,7 @@ yarn
 
 #### Passo 3
 
-Inicie o servidor como mostrado na [seção anterior](#iniciando-servidor-node.js).
+Inicie o servidor como mostrado na [seção anterior](#iniciando-servidor-nodejs).
 
 #### Passo 4
 
@@ -101,7 +101,7 @@ Possuir instalados
 Antes de iniciar os serviços é necessário definir corretamente as variáveis de ambiente. Para isso, crie localmente um arquivo `.env` e preencha-o com o mesmo conteúdo do arquivo `.env.example` já existente substituindo cada "???" pelo seu respectivo valor esperado:
 
 - `MONGO_DB`: Nome do banco de dados que se deseja armazenar as rotas e paradas de ônibus vindos do arquivo GTFS presente na [API SPTrans]((http://www.sptrans.com.br/desenvolvedores)).
-- `API_OLHO_VIVO_TOKEN`: Após se cadastrar no [portal da API Olho Vivo](http://www.sptrans.com.br/desenvolvedores/cadastro-desenvolvedores/) de São Paulo e criar uma aplicação, você receberá esse token.
+- `API_OLHO_VIVO_TOKEN`: Após se cadastrar no [portal da API Olho Vivo](http://www.sptrans.com.br/desenvolvedores/cadastro-desenvolvedores/) de São Paulo e criar uma aplicação, você receberá esse token. [Teve algum problema com seu token?](#troubleshooting). **Saiba que a liberação deste pode demorar algumas horas após sua criação.**
 - `APPLICATION_SECRET`: À nível de testes este pode ser apenas um conjunto alfanumérico Mais informações em: https://www.playframework.com/documentation/2.8.x/ApplicationSecret.
 
 Após isso, basta subir as aplicações utilizando o [`docker-compose`](https://docs.docker.com/compose/) como segue.
@@ -143,3 +143,23 @@ docker-compose -f common-services.yml -f docker-compose-lagom.yml up
 ### Acessando a aplicação Web
 
 Com todos os serviços no ar, basta acessar http://localhost/ no navegador.
+
+---
+
+## Troubleshooting
+
+### **Clico em todas as paradas, mas nenhuma tem ônibus previstos.**
+
+Isso pode acontecer devido a algum problema nas requisições do servidor.
+ 
+1. Verifique sua conexão com a internet. 
+1. Verifique se o servidor está no ar. 
+2. Verifique se o MongoDB também está funcionando.
+3. Vá para o passo logo abaixo.
+
+### **Meu token não funciona.**
+
+Para saber se seu token está funcionando faça uma requisição HTTP POST para http://api.olhovivo.sptrans.com.br/v2.1/Login/Autenticar?token={token} substituindo `{token}` pelo seu token. Se retornado `true`, este está funcionando e `false` significa algum problema na autenticação.
+
+**Saiba que a liberação deste pode demorar algumas horas após sua criação.**
+
