@@ -2,6 +2,12 @@
 
 Esta aplicação foi criada com o intuito de demonstrar as diferenças e características entre aplicações monolíticas e as que seguem a arquitetura de microsserviços, representadas respectivamente pelas tecnologias [Node.js](https://nodejs.org/en/) e [Lagom](https://www.lagomframework.com/) em sua versão para a linguagem Scala.
 
+## índice
+
+- [Start em Desenvolvimento](#desenvolvimento)
+- [Start em Produção](#produção)
+- [FAQ / Troubleshooting](#troubleshooting)
+
 ---
 
 ## Desenvolvimento
@@ -148,14 +154,20 @@ Com todos os serviços no ar, basta acessar http://localhost/ no navegador.
 
 ## Troubleshooting
 
-### **Clico em todas as paradas, mas nenhuma tem ônibus previstos.**
+### **Entro na aplicação, porém nenhum parada é mostrada.**
 
-Isso pode acontecer devido a algum problema nas requisições do servidor.
- 
-1. Verifique sua conexão com a internet. 
+Isso pode acontecer devido a algum problema nas requisições com o servidor.
+
 1. Verifique se o servidor está no ar. 
 2. Verifique se o MongoDB também está funcionando.
-3. Vá para o passo logo abaixo.
+3. Verifique os passos logo abaixo.
+
+### **Clico em todas as paradas, mas nenhuma tem ônibus previstos.**
+
+Isso pode acontecer devido a algum problema nas requisições com a API Olho Vivo.
+
+1. Verifique sua conexão com a internet.
+2. Vá para o passo logo abaixo.
 
 ### **Meu token não funciona.**
 
