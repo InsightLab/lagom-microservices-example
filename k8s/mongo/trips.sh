@@ -1,0 +1,1 @@
+mongoimport --db bmap --collection trips --file "/trips.json" --jsonArray

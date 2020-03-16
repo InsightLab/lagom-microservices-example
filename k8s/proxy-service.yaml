@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: microservices-example
+  labels:
+    app: proxy
+  name: proxy
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: proxy
+status:
+  loadBalancer: {}

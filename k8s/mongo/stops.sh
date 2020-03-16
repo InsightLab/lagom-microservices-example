@@ -1,0 +1,1 @@
+mongoimport --db bmap --collection stops --file "/stops.json" --jsonArray
