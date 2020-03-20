@@ -6,6 +6,7 @@ Esta aplicação foi criada com o intuito de demonstrar as diferenças e caracte
 
 - [Start em Desenvolvimento](#desenvolvimento)
 - [Start em Produção](#produção)
+- [Start usando Kubernetes](#kubernetes)
 - [FAQ / Troubleshooting](#troubleshooting)
 
 ---
@@ -174,4 +175,160 @@ Isso pode acontecer devido a algum problema nas requisições com a API Olho Viv
 Para saber se seu token está funcionando faça uma requisição HTTP POST para http://api.olhovivo.sptrans.com.br/v2.1/Login/Autenticar?token={token} substituindo `{token}` pelo seu token. Se retornado `true`, este está funcionando e `false` significa algum problema na autenticação.
 
 **Saiba que a liberação deste pode demorar algumas horas após sua criação.**
+
+# Kubernetes
+
+### Pré-requisitos
+
+Possuir instalados
+
+- [docker](https://www.docker.com/)
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) É possivel que na utilização de outras ferramentas parecidads com o minikube, alguns dos passos descritos abaixo tenham um funcionamento inadequado.
+
+Partimos do princípio de que quem estiver lendo esse README, tem alguns conhecimentos de conceitos básicos do Kubernetes, como Namespace, Services, Deployments, Pods, ConfigMaps, entre outros.
+
+
+### Comandos iniciais
+
+É necessário criar o namespace `microservices-example` e configurá-lo como namespace padrão. Para isso, basta executar os dois comandos abaixo:
+
+```
+$ kubectl create namespace microservices-example
+$ kubectl config set-context --current --namespace=microservices-example
+```
+### Criação do ConfigMap
+No contexto desse projeto, ConfigMap é usado para armazenar variáveis que serão usadas pelos microsserviços. Para criá-lo, é necessário seguir o passo de criação do arquivo `.env`, seguindo o padrão no arquivo `.env-example`. Segue o exemplo abaixo:
+
+Arquivo: `.env`
+
+```
+MONGO_DB=bmap
+API_OLHO_VIVO_TOKEN=???
+APPLICATION_SECRET=???
+MONGO_HOST=mongo
+```
+
+Você deve alterar as variáveis com `???` seguindo as informações abaixo:
+
+- `API_OLHO_VIVO_TOKEN`: Após se cadastrar no [portal da API Olho Vivo](http://www.sptrans.com.br/desenvolvedores/cadastro-desenvolvedores/) de São Paulo e criar uma aplicação, você receberá esse token. [Teve algum problema com seu token?](#troubleshooting). **Saiba que a liberação deste pode demorar algumas horas após sua criação.**
+- `APPLICATION_SECRET`: À nível de testes este pode ser apenas um conjunto alfanumérico Mais informações em: https://www.playframework.com/documentation/2.8.x/ApplicationSecret.
+
+Por fim, devemos criar o ConfigMap nomeado de `env`, com o seguinte comando (necessário que os passos acima tenham sido executados corretamente):
+
+```
+$ cd lagom-microservices-example/
+$ kubectl create cm env --from-env-file .env
+
+# Para visualizar o ConfigMap recém criado, use o comando a seguir
+$ kubectl get env
+```
+
+O retorno deve ser algo como:
+| NAME | DATA  | AGE |
+|------|-------|-----|
+| env  |  6    | 10d |
+
+
+
+### Build das imagens do docker
+
+A ferramenta `minikube` possui um docker "embutido". No processo de geração de Services e Deployments, é nesse ambiente docker embutido que se localizam as imagens que o kubernetes usará. Portanto, como temos imagens (Dockerfiles) customizadas, é recomendável que criemos nossas próprias imagens. Para isso, devemos usar os seguintes comandos:
+
+
+```
+$ eval $(minikube docker-env)
+$ docker build -t mongo-local k8s/mongo/
+$ docker build -t node-example nodejs-api/
+$ docker build -t nginx-example proxy/
+```
+
+Para o `webapp` é um pouco diferente. É possível que ao efetuar o build da imagem do webapp, o docker tenha algum problema com memória. Uma solução paleativa encontrada é a de instalar as dependências e gerar os arquivos da pasta `build` do webapp fora do comando docker. Para isso você deve alterar dois arquivos localizados na pasta `/webapp`: `.dockerignore` e `Dockerfile`.
+
+`.dockerignore` na linha `10`, comentar o parâmetro `/build`:
+
+`original`
+```
+.
+.
+.
+# production
+ /build
+.
+.
+.
+```
+
+`comentado`
+```
+.
+.
+.
+# production
+# /build
+.
+.
+.
+```
+
+`Dockerfile` também na linha `10`, comentar o parâmetro `RUN yarn build`
+
+`original`
+```
+.
+.
+.
+RUN yarn
+RUN yarn build
+.
+.
+.
+```
+
+`comentado`
+```
+.
+.
+.
+RUN yarn
+#RUN yarn build
+.
+.
+.
+```
+
+Por fim, siga os seguintes passos:
+
+```
+$ cd webapp
+$ yarn
+$ yarn build
+$ docker build -t webapp .
+```
+
+Para visualizar as imagens geradas use o comando `$ docker images`. Você deverá ver no mínimo 4 imagens:
+- `webapp`
+- `mongo-local`
+- `microservices-example-node`
+- `proxy`
+
+
+### Criação de Services e Deployments do Kubernetes
+
+Agora que já geramos as imagens do docker, devemos criar os Services e Deployments para que possamos acessar nossa aplicação. Use os seguintes comandos:
+```
+$ kubectl apply -f k8s/
+```
+
+Em seguida, verifique se os pod estão rodando corretamenta com o seguinte comando:
+
+```
+$ kubcetl get po
+```
+A saída deverá ser a seguinte:
+|          NAME           | READY |  STATUS     |  RESTARTS |  AGE |
+| mongo-65cff8f96-j99z8   | 1/1   |  Running    |     0     |  42s |
+| proxy-6fd459dfc4-lrx7c  | 0/1   |  Running    |     0     |  42s |
+| server-6fc6d4d46d-gxqw8 | 1/1   |  Running    |     0     |  42s |
+| webapp-66d6d57967-9tr7c | 1/1   |  Running    |     0     |  42s |
+
 
