@@ -2,12 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: microservices-example
-  labels:
-    service: webapp
   name: webapp
 spec:
   replicas: 1
-  strategy: {}
   selector:
     matchLabels:
       app: webapp
@@ -15,13 +12,13 @@ spec:
     metadata:
       labels:
         app: webapp
-        tier: frontend
-        track: stable
     spec:
       containers:
       - image: webapp
         imagePullPolicy: Never
         name: webapp
+        ports:
+          - containerPort: 3000
         resources: {}
       restartPolicy: Always
 status: {}
