@@ -326,6 +326,7 @@ $ kubcetl get po
 ```
 A saída deverá ser a seguinte:
 |          NAME           | READY |  STATUS     |  RESTARTS |  AGE |
+|-------------------------|-------|-------------|-----------|------|
 | mongo-65cff8f96-j99z8   | 1/1   |  Running    |     0     |  42s |
 | proxy-6fd459dfc4-lrx7c  | 0/1   |  Running    |     0     |  42s |
 | server-6fc6d4d46d-gxqw8 | 1/1   |  Running    |     0     |  42s |
