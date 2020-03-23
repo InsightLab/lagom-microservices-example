@@ -2,26 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: microservices-example
-  name: server
+  name: node-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: server
+      app: node-server
   template:
     metadata:
       labels:
-        service: server
+        app: node-server
     spec:
       containers:
       - image: microservices-example-node:prod
-        name: microservices-example-node
+        name: node-server
         envFrom:
         - configMapRef:
             name: env
         ports:
           - containerPort: 9000
-            name: http
         imagePullPolicy: Never
+        resources: {}
       restartPolicy: Always
 status: {}

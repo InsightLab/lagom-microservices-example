@@ -183,12 +183,16 @@ Para saber se seu token está funcionando faça uma requisição HTTP POST para 
 Possuir instalados
 
 - [docker](https://www.docker.com/)
-- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) É possivel que na utilização de outras ferramentas parecidads com o minikube, alguns dos passos descritos abaixo tenham um funcionamento inadequado.
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) 
+
+É possivel que na utilização de outras ferramentas parecidads com o minikube, alguns dos passos descritos abaixo tenham um funcionamento inadequado.
 
 Partimos do princípio de que quem estiver lendo esse README, tem alguns conhecimentos de conceitos básicos do Kubernetes, como Namespace, Services, Deployments, Pods, ConfigMaps, entre outros.
 
 
 ### Comandos iniciais
+
+Para dar início aos passos abaixo o minikube deve estar instalado e executando.
 
 É necessário criar o namespace `microservices-example` e configurá-lo como namespace padrão. Para isso, basta executar os dois comandos abaixo:
 
