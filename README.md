@@ -185,7 +185,7 @@ Possuir instalados
 - [docker](https://www.docker.com/)
 - [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) 
 
-É possivel que na utilização de outras ferramentas parecidads com o minikube, alguns dos passos descritos abaixo tenham um funcionamento inadequado.
+É possivel que na utilização de outras ferramentas similares ao minikube, alguns dos passos descritos abaixo tenham um funcionamento inadequado.
 
 Partimos do princípio de que quem estiver lendo esse README, tem alguns conhecimentos de conceitos básicos do Kubernetes, como Namespace, Services, Deployments, Pods, ConfigMaps, entre outros.
 
@@ -210,6 +210,7 @@ MONGO_DB=bmap
 API_OLHO_VIVO_TOKEN=???
 APPLICATION_SECRET=???
 MONGO_HOST=mongo
+PORT=9000
 ```
 
 Você deve alterar as variáveis com `???` seguindo as informações abaixo:
@@ -242,8 +243,7 @@ A ferramenta `minikube` possui um docker "embutido". No processo de geração de
 ```
 $ eval $(minikube docker-env)
 $ docker build -t mongo-local k8s/mongo/
-$ docker build -t node-example nodejs-api/
-$ docker build -t nginx-example proxy/
+$ docker build -t microservices-example-node:prod nodejs-api/
 ```
 
 Para o `webapp` é um pouco diferente. É possível que ao efetuar o build da imagem do webapp, o docker tenha algum problema com memória. Uma solução paleativa encontrada é a de instalar as dependências e gerar os arquivos da pasta `build` do webapp fora do comando docker. Para isso você deve alterar dois arquivos localizados na pasta `/webapp`: `.dockerignore` e `Dockerfile`.
@@ -252,52 +252,52 @@ Para o `webapp` é um pouco diferente. É possível que ao efetuar o build da im
 
 `original`
 ```
-.
-.
-.
-# production
- /build
-.
-.
-.
+6       .
+7       .
+8       .
+9  # production
+10  /build
+11      .
+12      .
+13      .
 ```
 
 `comentado`
 ```
-.
-.
-.
-# production
-# /build
-.
-.
-.
+6       .
+7       .
+8       .
+9  # production
+10 # /build
+11      .
+12      .
+13      .
 ```
 
 `Dockerfile` também na linha `10`, comentar o parâmetro `RUN yarn build`
 
 `original`
 ```
-.
-.
-.
-RUN yarn
-RUN yarn build
-.
-.
-.
+6       .
+7       .
+8       .
+9  RUN yarn
+10 RUN yarn build
+11      .
+12      .
+13      .
 ```
 
 `comentado`
 ```
-.
-.
-.
-RUN yarn
-#RUN yarn build
-.
-.
-.
+6       .
+7       .
+8       .
+9  RUN yarn
+10 # RUN yarn build
+11      .
+12      .
+13      .
 ```
 
 Por fim, siga os seguintes passos:
@@ -313,10 +313,35 @@ Para visualizar as imagens geradas use o comando `$ docker images`. Você dever�
 - `webapp`
 - `mongo-local`
 - `microservices-example-node`
-- `proxy`
+
+### NGINX-Ingress
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) faz parte da API do Kubernetes e responsável por gerenciar os serviços de um cluster, provendo Balanceamento de carga, SSL e hospedagem baseada em nomes virtuais.
+
+Ele deve ser composto por duas partes: Ingress Resource - `ingress.yaml` e Ingress Controller - `nginx-ingress-controller`. O primeiro mapeia as rotas e os nomes virtuais, o segundo gerencia o acesso através de um nignx "embutido".
+
+Para habilitarmos o `nginx-ingress-controller`, devemos usar o comando abaixo:
+```
+$ minikube addons enable ingress
+
+# A saída deve ser semelhante à mensagem abaixo. 
+The 'ingress' addon is enabled
+
+```
+
+Para visualizar se o nginx-ingress-controller está executando, use o comando:
+```
+$ kubectl get po -n kube-system
+```
+
+A saída deverá ser semelhante à tabela abaixo:
+|                   NAME                      | READY |  STATUS     |  RESTARTS |  AGE |
+|---------------------------------------------|-------|-------------|-----------|------|
+| nginx-ingress-controller-6fc5bcc8c9-pgtx2   | 1/1   |  Running    |     0     |  12s |
 
 
-### Criação de Services e Deployments do Kubernetes
+A aplicação do `ingress.yaml` é feita na seção abaixo com um comando mais genérico de aplicação dos Services e Deployments.
+
+### Criação de Services, Deployments e Ingress do Kubernetes
 
 Agora que já geramos as imagens do docker, devemos criar os Services e Deployments para que possamos acessar nossa aplicação. Use os seguintes comandos:
 ```
@@ -332,8 +357,16 @@ A saída deverá ser a seguinte:
 |          NAME           | READY |  STATUS     |  RESTARTS |  AGE |
 |-------------------------|-------|-------------|-----------|------|
 | mongo-65cff8f96-j99z8   | 1/1   |  Running    |     0     |  42s |
-| proxy-6fd459dfc4-lrx7c  | 0/1   |  Running    |     0     |  42s |
 | server-6fc6d4d46d-gxqw8 | 1/1   |  Running    |     0     |  42s |
 | webapp-66d6d57967-9tr7c | 1/1   |  Running    |     0     |  42s |
 
 
+Para verificar se o `ingress.yaml` foi aplicado, ou seja, se o ingress resource foi aplicado, pode-se usar o comando abaixo:
+
+```
+$ kubectl get ing 
+```
+
+|          NAME           | HOSTS |      ADDRESS      |   PORTS |  AGE |
+|-------------------------|-------|-------------------|---------|------|
+|          ing            |   *   |    192.168.99.102 |  80     |  30s |
