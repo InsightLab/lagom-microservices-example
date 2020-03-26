@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ing-service
+  name: ing-lagom-service
   labels:
-    app: ing
+    app: ing-lagom
 spec:
   type: NodePort
   selector:

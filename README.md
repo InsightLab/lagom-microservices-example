@@ -246,6 +246,16 @@ $ docker build -t mongo-local k8s/mongo/
 $ docker build -t microservices-example-node:prod nodejs-api/
 ```
 
+`Para gerar a imagem da api em node.js:`
+```
+$ docker build -t microservices-example-node:prod nodejs-api/
+```
+
+`Para gerar a imagem da api em lagom (observação - ver seção para utilizar o lagom como api):` 
+```
+$ sbt docker:publishLocal
+```
+
 Para o `webapp` é um pouco diferente. É possível que ao efetuar o build da imagem do webapp, o docker tenha algum problema com memória. Uma solução paleativa encontrada é a de instalar as dependências e gerar os arquivos da pasta `build` do webapp fora do comando docker. Para isso você deve alterar dois arquivos localizados na pasta `/webapp`: `.dockerignore` e `Dockerfile`.
 
 `.dockerignore` na linha `10`, comentar o parâmetro `/build`:
@@ -312,7 +322,8 @@ $ docker build -t webapp .
 Para visualizar as imagens geradas use o comando `$ docker images`. Você deverá ver no mínimo 4 imagens:
 - `webapp`
 - `mongo-local`
-- `microservices-example-node`
+- `microservices-example-node` (Caso tenha usado a imagem da api em node)
+- `spbus-impl` (Caso tenha usado a imagem da api em lagom)
 
 ### NGINX-Ingress
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) faz parte da API do Kubernetes e responsável por gerenciar os serviços de um cluster, provendo Balanceamento de carga, SSL e hospedagem baseada em nomes virtuais.
@@ -343,25 +354,49 @@ A aplicação do `ingress.yaml` é feita na seção abaixo com um comando mais g
 
 ### Criação de Services, Deployments e Ingress do Kubernetes
 
-Agora que já geramos as imagens do docker, devemos criar os Services e Deployments para que possamos acessar nossa aplicação. Use os seguintes comandos:
+Agora que já geramos as imagens do docker, devemos criar os Services e Deployments para que possamos acessar nossa aplicação. Antes disso, uma breve explicação da estrutura de diretórios. Temos os seguintes diretórios na pasta `k8s`:
+- `common` (Arquivos .yaml contendo as configurações do webapp e mongo)
+- `node` (Arquivos .yaml contendo as configurações do ingress para a api node)
+- `lagom` (Arquivos .yaml contendo as configurações do ingress para a api lagom)
+- `mongo` (Arquivso gerais para criação da imagem do mongo e para inserção dos dados relacionados à paradas e rotas)
+
+Para subir as aplicações, use os seguintes comandos:
+
+#### Serviços comuns (Mongo e webapp)
+
 ```
-$ kubectl apply -f k8s/
+$ kubectl apply -f k8s/common
 ```
 
-Em seguida, verifique se os pod estão rodando corretamenta com o seguinte comando:
+
+#### Usando a api em node
+```
+$ kubectl apply -f k8s/node
+```
+
+
+#### Usando a api em lagom
+
+```
+$ kubectl apply -f k8s/lagom
+```
+
+
+
+Em seguida, verifique se os pod's estão rodando corretamente com o seguinte comando:
 
 ```
 $ kubcetl get po
 ```
 A saída deverá ser a seguinte:
-|          NAME           | READY |  STATUS     |  RESTARTS |  AGE |
-|-------------------------|-------|-------------|-----------|------|
-| mongo-65cff8f96-j99z8   | 1/1   |  Running    |     0     |  42s |
-| server-6fc6d4d46d-gxqw8 | 1/1   |  Running    |     0     |  42s |
-| webapp-66d6d57967-9tr7c | 1/1   |  Running    |     0     |  42s |
+|          NAME               | READY |  STATUS     |  RESTARTS |  AGE |
+|-----------------------------|-------|-------------|-----------|------|
+| mongo-65cff8f96-j99z8       | 1/1   |  Running    |     0     |  42s |
+| api-server-6fc6d4d46d-gxqw8 | 1/1   |  Running    |     0     |  42s |
+| webapp-66d6d57967-9tr7c     | 1/1   |  Running    |     0     |  42s |
 
 
-Para verificar se o `ingress.yaml` foi aplicado, ou seja, se o ingress resource foi aplicado, pode-se usar o comando abaixo:
+Para verificar se o Ingress resource foi aplicado, pode-se usar o comando abaixo:
 
 ```
 $ kubectl get ing 
@@ -370,3 +405,6 @@ $ kubectl get ing
 |          NAME           | HOSTS |      ADDRESS      |   PORTS |  AGE |
 |-------------------------|-------|-------------------|---------|------|
 |          ing            |   *   |    192.168.99.102 |  80     |  30s |
+
+
+Para que não ocorra conflitos entre os ingress é aconselhável rodar somente um por vez (node ou lagom). Perceba que nos diretórios do node e lagom, existem arquivos do ingress que configuram as rotas e o servidor para cada uma das api's.
