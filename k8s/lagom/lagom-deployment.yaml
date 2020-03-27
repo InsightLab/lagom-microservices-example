@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: microservices-example
+  name: lagom-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lagom-server
+  template:
+    metadata:
+      labels:
+        app: lagom-server
+    spec:
+      containers:
+      - image: spbus-impl:1.0-SNAPSHOT
+        name: lagom-server
+        envFrom:
+        - configMapRef:
+            name: env
+        ports:
+          - containerPort: 9000
+        imagePullPolicy: Never
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ing-node
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+    nginx.ingress.kubernetes.io/upstream-vhost: $host
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /(.*)
+        backend:
+          serviceName: webapp
+          servicePort: 3000
+      - path: /(ws|api/sp)(.*)
+        backend:
+          serviceName: node-server
+          servicePort: 9000
