@@ -27,11 +27,12 @@ services:
     image: mongo
     volumes:
       - /tmp/microservices-example-node/data:/data/db
-    ports:
-      - "27017:27017"
 
   proxy:
     image: nginx_balancer
     build: ./proxy
     ports:
       - 80:80
+    depends_on:
+      - "server"
+      - "webapp"
