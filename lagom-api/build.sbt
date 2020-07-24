@@ -42,7 +42,7 @@ dependencyOverrides ++= Seq(
 )
 
 lagomUnmanagedServices in ThisBuild := Map(
-  "spbus-client" -> "http://api.olhovivo.sptrans.com.br/v2.1"
+  "spbus-client" -> "http://api.olhovivo.sptrans.com.br"
 )
 
 lazy val `spbus` = (project in file("."))
