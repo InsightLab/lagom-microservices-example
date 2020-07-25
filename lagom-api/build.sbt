@@ -12,6 +12,8 @@ val akkaQuartzScheduler = "com.enragedginger" %% "akka-quartz-scheduler" % "1.8.
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
 val akkaDiscovery = "com.lightbend.lagom" %% "lagom-scaladsl-akka-discovery-service-locator" % "1.0.0"
 
+envFileName in ThisBuild := s".env"
+
 val akkaVersion = "2.6.3"
 
 dependencyOverrides ++= Seq(
