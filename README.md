@@ -62,6 +62,26 @@ Inicie a aplicação:
 node index.js
 ```
 
+
+### Iniciando Servidor Scala com Lagom
+
+#### Seguir passos 1, 2 e 3 da seção anterior
+#### Passo 4
+
+Realize as configurações necessários com o **sbt**. Já dentro da pasta `/lagom-api` execute o seguinte comando:
+
+```sh
+sbt
+```
+
+#### Passo 5
+
+Já dentro do **sbt shell**, inicie a aplicação:
+
+```sh
+sbt:spbus> runAll
+```
+
 ### Iniciando Webapp
 
 #### Passo 1
